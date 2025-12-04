@@ -21,3 +21,9 @@ backend systeem voor reserveringen van camping Le Marconnes
 - Jannes van den Berg (2206808)
 - Othman Azouzal (2404269)
 
+## Setup
+
+1. Clone repo: `git clone https://github.com/jayden2064859/le-marconnes.git`
+2. Run DBscript in SQL Server Management Studio 
+3. Connection string aanpassen naar eigen servernaam
+Server=MSI\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;
