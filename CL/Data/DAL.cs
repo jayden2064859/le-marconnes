@@ -7,7 +7,7 @@ namespace CL.Data
 {
     public static class DAL
     {
-        public static string connectionString = @"Server=MSI\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static string connectionString = @"Server=localhost\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;";
 
         // reservering toevoegen
         public static bool InsertReservering(Reservering reservering)
