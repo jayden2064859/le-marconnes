@@ -1,0 +1,71 @@
+CREATE DATABASE LeMarconnesDB;
+GO
+
+USE LeMarconnesDB;
+GO
+
+CREATE TABLE AccommodatieTypes (
+    Id INT PRIMARY KEY,
+    Naam NVARCHAR(20) NOT NULL
+);
+
+INSERT INTO AccommodatieTypes (Id, Naam) VALUES
+(1, 'Camping'),
+(2, 'Gîte'),
+(3, 'Hotel');
+GO
+
+CREATE TABLE Accommodaties (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    TypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieTypes(Id),
+    MaxPersonen INT NOT NULL,
+    IsBeschikbaar BIT DEFAULT 1
+);
+
+INSERT INTO Accommodaties (TypeId, MaxPersonen) VALUES
+(1, 6),
+(1, 4),
+(2, 9),
+(3, 2),
+(3, 4),
+(3, 5);
+GO
+
+CREATE TABLE Klanten (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Voornaam NVARCHAR(50) NOT NULL,
+    Tussenvoegsel NVARCHAR(20),
+    Achternaam NVARCHAR(50) NOT NULL,
+    Email NVARCHAR(100),
+    Telefoonnummer NVARCHAR(20),
+    RegistratieDatum DATETIME DEFAULT GETDATE()
+);
+
+INSERT INTO Klanten (Voornaam, Tussenvoegsel, Achternaam, Email, Telefoonnummer) VALUES
+('Jan', '', 'Jansen', 'jan@voorbeeld.nl', '0612345678'),
+('Marie', 'de', 'Vries', 'marie@voorbeeld.nl', '0623456789');
+GO
+
+CREATE TABLE Reserveringen (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    KlantId INT NOT NULL FOREIGN KEY REFERENCES Klanten(Id),
+    AccommodatieId INT NOT NULL FOREIGN KEY REFERENCES Accommodaties(Id),
+    StartDatum DATE NOT NULL,
+    EindDatum DATE NOT NULL,
+    AantalVolwassenen INT DEFAULT 1,
+    AantalKinderen0_7 INT DEFAULT 0,
+    AantalKinderen7_12 INT DEFAULT 0,
+    Hond BIT DEFAULT 0,
+    Elektriciteit BIT DEFAULT 0,
+    AantalDagenElektriciteit INT DEFAULT 0,
+    TotaalPrijs DECIMAL(10,2) NOT NULL,
+    Status NVARCHAR(20) DEFAULT 'Gereserveerd',
+    DatumAangemaakt DATETIME DEFAULT GETDATE()
+);
+
+
+INSERT INTO Reserveringen 
+(KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, AantalKinderen0_7, AantalKinderen7_12, Hond, Elektriciteit, AantalDagenElektriciteit, TotaalPrijs) VALUES
+(1, 1, '2025-12-03', '2025-12-07', 2, 0, 1, 1, 1, 3, 127.50),
+(2, 1, '2025-12-10', '2025-12-15', 4, 0, 2, 0, 1, 5, 195.00);
+GO
