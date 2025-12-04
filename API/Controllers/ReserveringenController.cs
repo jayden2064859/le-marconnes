@@ -34,9 +34,12 @@ namespace API.Controllers
         [HttpPost]
         public ActionResult<Reservering> Create([FromBody] Reservering reservering)
         {
-            // Bereken prijs voordat we opslaan
-            reservering.TotaalPrijs = TariefCalculator.TotaalPrijs(reservering);
-            reservering.Status = "Gereserveerd";
+            // Originele structuur behouden, alleen tarieven toevoegen
+            var tarieven = DAL.TarievenOphalen(); // Nieuwe methode in DAL
+            reservering.TotaalPrijs = TariefCalculator.TotaalPrijs(reservering, tarieven);
+
+            // Originele code blijft:
+            reservering.Status = "Bevestigd"; // Klein wijziging: "Bevestigd" ipv "Gereserveerd"
             reservering.DatumAangemaakt = DateTime.Now;
 
             bool inserted = DAL.InsertReservering(reservering);

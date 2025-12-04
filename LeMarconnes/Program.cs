@@ -97,7 +97,7 @@ namespace LeMarconnes
             bool finished = false;
             while (!finished)
             {
-                Console.WriteLine("\nVoer id in van reservering die je wil ophalen: ");
+                Console.Write("\nVoer id in van reservering die je wil ophalen: ");
                 int id = int.Parse(Console.ReadLine());
 
 
@@ -117,8 +117,8 @@ namespace LeMarconnes
                         Console.WriteLine($"Volwassenen: {res.AantalVolwassenen}");
                         Console.WriteLine($"Kinderen 0-7: {res.AantalKinderen0_7}");
                         Console.WriteLine($"Kinderen 7-12: {res.AantalKinderen7_12}");
-                        Console.WriteLine($"Hond: {(res.Hond ? "Ja" : "Nee")}");
-                        Console.WriteLine($"Elektriciteit: {(res.Elektriciteit ? "Ja" : "Nee")}");
+                        Console.WriteLine($"Hond: {res.AantalHonden}");
+                        Console.WriteLine($"Elektriciteit: {(res.HeeftElectriciteit ? "Ja" : "Nee")} - {res.AantalDagenElectriciteit} dagen");
                         Console.WriteLine($"Prijs: {res.TotaalPrijs},-");
                         Console.WriteLine($"Status: {res.Status}");
                         Console.WriteLine(new string('-', 30));
@@ -129,11 +129,13 @@ namespace LeMarconnes
                     else
                     {
                         Console.WriteLine($"Reservering met id {id} niet gevonden");
+                        Console.WriteLine(new string('-', 30));
                     }
                 }
                 catch
                 {
                     Console.WriteLine("\nEr is iets misgegaan\n");
+                    Console.WriteLine(new string('-', 30));
                 }
             }
            
@@ -145,13 +147,13 @@ namespace LeMarconnes
 
             Reservering nieuweReservering = new Reservering();
 
-             Console.Write("Klant ID: ");
+            Console.Write("Klant ID: ");
             int klantId = int.Parse(Console.ReadLine());
-
             nieuweReservering.KlantId = klantId;
 
-               
-            nieuweReservering.AccommodatieId = 1; // alleen camping word voor nu uitgewerkt, dus accommodatietype is altijd 1 (1=camping)
+            Console.Write("Accommodatie ID: ");
+            int aId = int.Parse(Console.ReadLine());
+            nieuweReservering.AccommodatieId = aId; 
 
             Console.Write("Startdatum (dd-mm-jjjj): ");
             string startInput = Console.ReadLine();
@@ -170,16 +172,17 @@ namespace LeMarconnes
             Console.Write("Aantal kinderen 7-12 jaar: ");
             nieuweReservering.AantalKinderen7_12 = int.Parse(Console.ReadLine());
 
-            Console.Write("Hond mee? (j/n): ");
-            nieuweReservering.Hond = Console.ReadLine().ToLower() == "j";
+            Console.Write("Aantal honden: ");
+            int aantalHonden = int.Parse(Console.ReadLine());
+            nieuweReservering.AantalHonden = aantalHonden;
 
-            Console.Write("Elektriciteit gewenst? (j/n): ");
-            nieuweReservering.Elektriciteit = Console.ReadLine().ToLower() == "j";
+            Console.Write("Elektriciteit gewenst? (j/n): ");         
+            nieuweReservering.HeeftElectriciteit = Console.ReadLine().ToLower() == "j"; 
 
-            if (nieuweReservering.Elektriciteit)
+            if (nieuweReservering.HeeftElectriciteit)
             {
                 Console.Write($"Voor hoeveel nachten elektriciteit? (max {nieuweReservering.AantalNachten}): ");
-                nieuweReservering.AantalDagenElektriciteit = int.Parse(Console.ReadLine());
+                nieuweReservering.AantalDagenElectriciteit = int.Parse(Console.ReadLine());
             }
 
             nieuweReservering.Status = "Gereserveerd";
@@ -191,19 +194,22 @@ namespace LeMarconnes
                 if (response.IsSuccessStatusCode)
                 {
                     var gemaakt = await response.Content.ReadFromJsonAsync<Reservering>();
-                    Console.WriteLine($"\nAangemaakt! Prijs: {gemaakt.TotaalPrijs},-\n");
+                    Console.WriteLine($"\nAangemaakt! Prijs: {gemaakt.TotaalPrijs},-");
+                    Console.WriteLine(new string('-', 30));
+
                 }
             }
             catch
             {
                 Console.WriteLine("\nFout bij aanmaken\n");
+                Console.WriteLine(new string('-', 30));
             }
         }
 
 
         static async Task VerwijderReservering()
         {
-            Console.WriteLine("\nVoer Id in van reservering die je wil verwijderen: ");
+            Console.Write("\nVoer Id in van reservering die je wil verwijderen: ");
             int id = int.Parse(Console.ReadLine());
            
             try
@@ -213,15 +219,19 @@ namespace LeMarconnes
                 if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine($"\nReservering met id {id} succesvol verwijderd\n");
+                    Console.WriteLine(new string('-', 30));
                 }
                 else
                 {
                     Console.WriteLine($"\nReservering met id {id} niet gevonden\n");
+                    Console.WriteLine(new string('-', 30));
+
                 }
             }
             catch
             {
                 Console.WriteLine("\nEr is iets misgegaan\n");
+                Console.WriteLine(new string('-', 30));
             }
         }
 
@@ -254,9 +264,9 @@ namespace LeMarconnes
                     Console.WriteLine($"5.  AantalVolwassenen: {res.AantalVolwassenen}");
                     Console.WriteLine($"6.  AantalKinderen0_7: {res.AantalKinderen0_7}");
                     Console.WriteLine($"7.  AantalKinderen7_12: {res.AantalKinderen7_12}");
-                    Console.WriteLine($"8.  Hond: {res.Hond}");
-                    Console.WriteLine($"9.  Elektriciteit: {res.Elektriciteit}");
-                    Console.WriteLine($"10. AantalDagenElektriciteit: {res.AantalDagenElektriciteit}");
+                    Console.WriteLine($"8.  Hond: {res.AantalHonden}");
+                    Console.WriteLine($"9.  Elektriciteit: {res.HeeftElectriciteit}");
+                    Console.WriteLine($"10. AantalDagenElektriciteit: {res.AantalDagenElectriciteit}");
                     Console.WriteLine($"11. Status: {res.Status}");
                     Console.WriteLine(new string('-', 30));
 
@@ -298,15 +308,15 @@ namespace LeMarconnes
                             break;
                         case "8":
                             Console.Write("Hond (true/false): ");
-                            res.Hond = bool.Parse(Console.ReadLine());
+                            res.AantalHonden = int.Parse(Console.ReadLine());
                             break;
                         case "9":
                             Console.Write("Elektriciteit (true/false): ");
-                            res.Elektriciteit = bool.Parse(Console.ReadLine());
+                            res.HeeftElectriciteit = bool.Parse(Console.ReadLine());
                             break;
                         case "10":
                             Console.Write("AantalDagenElektriciteit: ");
-                            res.AantalDagenElektriciteit = int.Parse(Console.ReadLine());
+                            res.AantalDagenElectriciteit = int.Parse(Console.ReadLine());
                             break;
                         case "11":
                             Console.Write("Nieuwe Status: ");
@@ -327,15 +337,18 @@ namespace LeMarconnes
                 if (responsePut.IsSuccessStatusCode && finished != true)
                 {
                     Console.WriteLine($"\nReservering met id {id} succesvol bijgewerkt!\n");
+                    Console.WriteLine(new string('-', 30));
                 }
                 else if (!responsePut.IsSuccessStatusCode && finished != true)
                 {                    
                     Console.WriteLine("\nEr is een fout opgetreden bij het bijwerken.\n");
+                    Console.WriteLine(new string('-', 30));
                 }
             }
             catch
             {
                 Console.WriteLine("\nFout bij verbinden met API.\n");
+                Console.WriteLine(new string('-', 30));
             }
         }
 
