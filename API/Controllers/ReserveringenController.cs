@@ -3,6 +3,7 @@ using CL.Models;
 using CL.Data;
 using CL.Services;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 
 namespace API.Controllers
 {
@@ -60,5 +61,22 @@ namespace API.Controllers
             }
             return NotFound($"Reservering met Id {id} niet gevonden");
         }
+
+        // PUT: api/reseveringen/{id}
+        [HttpPut("{id}")]
+        public ActionResult Update(int id, [FromBody] Reservering res)
+        {
+            if (res == null || res.Id != id)
+                return BadRequest("Reservering ongeldig");
+
+            bool succes = DAL.UpdateReservering(res);
+
+            if (!succes)
+                return NotFound($"Reservering met id {id} niet gevonden.");
+
+            return Ok(res);
+        }
+
+
     }
 }

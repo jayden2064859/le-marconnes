@@ -82,6 +82,7 @@ namespace CL.Data
                         };
                         reserveringen.Add(reservering);
                     }
+                    
                 }
             }
 
@@ -148,39 +149,47 @@ namespace CL.Data
 
 
         // reservering updaten gebaseerd op id
-
-        public static bool UpdateReservering(int id)
+        public static bool UpdateReservering(Reservering res)
         {
-            // maak de db connectie
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
 
-                string sql = @"UPDATE Reserveringen 
-                       SET Naam = @Naam,
-                           Datum = @Datum,
-                           AantalPersonen = @AantalPersonen
-                       WHERE Id = @Id";
+                string sql = @"
+            UPDATE Reserveringen SET
+                KlantId = @KlantId,
+                AccommodatieId = @AccommodatieId,
+                StartDatum = @StartDatum,
+                EindDatum = @EindDatum,
+                AantalVolwassenen = @AantalVolwassenen,
+                AantalKinderen0_7 = @AantalKinderen0_7,
+                AantalKinderen7_12 = @AantalKinderen7_12,
+                Hond = @Hond,
+                Elektriciteit = @Elektriciteit,
+                AantalDagenElektriciteit = @AantalDagenElektriciteit,
+                Status = @Status
+            WHERE Id = @Id";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", id);
-                    command.Parameters.AddWithValue("@Naam", "Nieuwe naam");
-                    command.Parameters.AddWithValue("@Datum", DateTime.Now);
-                    command.Parameters.AddWithValue("@AantalPersonen", 4);
+                    command.Parameters.AddWithValue("@Id", res.Id);
+                    command.Parameters.AddWithValue("@KlantId", res.KlantId);
+                    command.Parameters.AddWithValue("@AccommodatieId", res.AccommodatieId);
+                    command.Parameters.AddWithValue("@StartDatum", res.StartDatum);
+                    command.Parameters.AddWithValue("@EindDatum", res.EindDatum);
+                    command.Parameters.AddWithValue("@AantalVolwassenen", res.AantalVolwassenen);
+                    command.Parameters.AddWithValue("@AantalKinderen0_7", res.AantalKinderen0_7);
+                    command.Parameters.AddWithValue("@AantalKinderen7_12", res.AantalKinderen7_12);
+                    command.Parameters.AddWithValue("@Hond", res.Hond);
+                    command.Parameters.AddWithValue("@Elektriciteit", res.Elektriciteit);
+                    command.Parameters.AddWithValue("@AantalDagenElektriciteit", res.AantalDagenElektriciteit);
+                    command.Parameters.AddWithValue("@Status", res.Status);
 
                     int rows = command.ExecuteNonQuery();
-
-                    return rows > 0; // true = succesvol // false = id niet gevonden
+                    return rows > 0;
                 }
-
-                // zoek in de database naar reservering met id dat matched met opgegeven id
-
-                // als id niet bestaat, geef een error message terug en laat opnieuw proberen
-                // als id wel bestaat, maak een genummerd lijstje van alle attributen van de reservering
-                // gebruiker voert opnieuw nummer in van attribuut wat hij wil wijzigen
-                // wanneer gebruiker hiermee klaar is, update de DB en geef een succesmelding terug
             }
         }
+
     }
 }
