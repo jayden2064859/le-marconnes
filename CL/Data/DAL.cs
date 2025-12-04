@@ -7,7 +7,7 @@ namespace CL.Data
 {
     public static class DAL
     {
-        public static string connectionString = @"Server=localhost\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static string connectionString = @"Server=MSI\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;";
 
         // reservering toevoegen
         public static bool InsertReservering(Reservering reservering)
@@ -104,6 +104,82 @@ namespace CL.Data
                     int rowsAffected = command.ExecuteNonQuery();
                     return rowsAffected > 0;
                 }
+            }
+        }
+
+        public static Reservering GetReserveringById(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = "SELECT * FROM Reserveringen WHERE Id = @Id";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                            return null;
+
+                        return new Reservering
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            KlantId = Convert.ToInt32(reader["KlantId"]),
+                            AccommodatieId = Convert.ToInt32(reader["AccommodatieId"]),
+                            StartDatum = Convert.ToDateTime(reader["StartDatum"]),
+                            EindDatum = Convert.ToDateTime(reader["EindDatum"]),
+                            AantalVolwassenen = Convert.ToInt32(reader["AantalVolwassenen"]),
+                            AantalKinderen0_7 = Convert.ToInt32(reader["AantalKinderen0_7"]),
+                            AantalKinderen7_12 = Convert.ToInt32(reader["AantalKinderen7_12"]),
+                            Hond = Convert.ToBoolean(reader["Hond"]),
+                            Elektriciteit = Convert.ToBoolean(reader["Elektriciteit"]),
+                            AantalDagenElektriciteit = Convert.ToInt32(reader["AantalDagenElektriciteit"]),
+                            TotaalPrijs = Convert.ToDecimal(reader["TotaalPrijs"]),
+                            Status = reader["Status"].ToString(),
+                            DatumAangemaakt = Convert.ToDateTime(reader["DatumAangemaakt"])
+                        };
+                    }
+                }
+            }
+        }
+
+
+        // reservering updaten gebaseerd op id
+
+        public static bool UpdateReservering(int id)
+        {
+            // maak de db connectie
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = @"UPDATE Reserveringen 
+                       SET Naam = @Naam,
+                           Datum = @Datum,
+                           AantalPersonen = @AantalPersonen
+                       WHERE Id = @Id";
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@Naam", "Nieuwe naam");
+                    command.Parameters.AddWithValue("@Datum", DateTime.Now);
+                    command.Parameters.AddWithValue("@AantalPersonen", 4);
+
+                    int rows = command.ExecuteNonQuery();
+
+                    return rows > 0; // true = succesvol // false = id niet gevonden
+                }
+
+                // zoek in de database naar reservering met id dat matched met opgegeven id
+
+                // als id niet bestaat, geef een error message terug en laat opnieuw proberen
+                // als id wel bestaat, maak een genummerd lijstje van alle attributen van de reservering
+                // gebruiker voert opnieuw nummer in van attribuut wat hij wil wijzigen
+                // wanneer gebruiker hiermee klaar is, update de DB en geef een succesmelding terug
             }
         }
     }

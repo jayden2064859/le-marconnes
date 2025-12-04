@@ -23,10 +23,11 @@ namespace LeMarconnes
             bool doorgaan = true;
             while (doorgaan)
             {
-                Console.WriteLine("1. Toon reserveringen");
-                Console.WriteLine("2. Nieuwe reservering");
-                Console.WriteLine("3. Reservering verwijderen");
-                Console.WriteLine("4. Afsluiten");
+                Console.WriteLine("1. Toon alle reserveringen");
+                Console.WriteLine("2. Zoek reservering op id");
+                Console.WriteLine("3. Nieuwe reservering maken");
+                Console.WriteLine("4. Reservering verwijderen");
+                Console.WriteLine("5. Afsluiten");
                 Console.Write("\nKeuze: ");
 
                 string keuze = Console.ReadLine();
@@ -36,13 +37,16 @@ namespace LeMarconnes
                     case "1":
                         await ToonReserveringen();
                         break;
-                    case "2":
-                        await MaakReservering();
+                    case "2": 
+                        await ZoekReserveringOpId();
                         break;
                     case "3":
-                        await VerwijderReservering();
+                        await MaakReservering();
                         break;
                     case "4":
+                        await VerwijderReservering();
+                        break;
+                    case "5":
                         doorgaan = false;
                         break;
                 }
@@ -61,7 +65,7 @@ namespace LeMarconnes
                 {
                     var reserveringen = await response.Content.ReadFromJsonAsync<List<Reservering>>();
 
-                    Console.WriteLine($"Aantal: {reserveringen.Count}\n");
+                    Console.WriteLine($"Totaal aantal: {reserveringen.Count}\n");
 
                     foreach (var res in reserveringen)
                     {
@@ -80,6 +84,53 @@ namespace LeMarconnes
             {
                 Console.WriteLine("API niet bereikbaar");
             }
+        }
+
+        static async Task ZoekReserveringOpId()
+        {
+
+            bool finished = false;
+            while (!finished)
+            {
+                Console.WriteLine("\nVoer id in van reservering die je wil ophalen: ");
+                int id = int.Parse(Console.ReadLine());
+
+
+                try
+                {
+                    var response = await client.GetAsync($"api/Reserveringen/{id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var res = await response.Content.ReadFromJsonAsync<Reservering>();
+
+                        Console.WriteLine($"\n--- RESERVERING {id} GEVONDEN ---");
+                        Console.WriteLine($"ID: {res.Id}");
+                        Console.WriteLine($"Klant: {res.KlantId}");
+                        Console.WriteLine($"Accommodatie: {res.AccommodatieId}");
+                        Console.WriteLine($"Van: {res.StartDatum:dd-MM-yyyy} tot {res.EindDatum:dd-MM-yyyy}");
+                        Console.WriteLine($"Volwassenen: {res.AantalVolwassenen}");
+                        Console.WriteLine($"Kinderen 0-7: {res.AantalKinderen0_7}");
+                        Console.WriteLine($"Kinderen 7-12: {res.AantalKinderen7_12}");
+                        Console.WriteLine($"Hond: {(res.Hond ? "Ja" : "Nee")}");
+                        Console.WriteLine($"Elektriciteit: {(res.Elektriciteit ? "Ja" : "Nee")}");
+                        Console.WriteLine($"Prijs: {res.TotaalPrijs},-");
+                        Console.WriteLine($"Status: {res.Status}");
+                        Console.WriteLine(new string('-', 30));
+
+                        finished = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Reservering met id {id} niet gevonden");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("\nEr is iets misgegaan\n");
+                }
+            }
+           
         }
 
         static async Task MaakReservering()

@@ -18,6 +18,17 @@ namespace API.Controllers
             return Ok(reserveringen);
         }
 
+        [HttpGet("{id}")]
+        public ActionResult<Reservering> GetById(int id)
+        {
+            var reservering = DAL.GetReserveringById(id);
+
+            if (reservering == null)
+                return NotFound($"Reservering met id {id} niet gevonden.");
+
+            return Ok(reservering);
+        }
+
         // POST: api/reserveringen
         [HttpPost]
         public ActionResult<Reservering> Create([FromBody] Reservering reservering)
