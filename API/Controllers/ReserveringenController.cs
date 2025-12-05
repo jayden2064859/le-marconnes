@@ -36,10 +36,14 @@ namespace API.Controllers
         [HttpPost]
         public ActionResult<Reservering> Create([FromBody] Reservering reservering)
         {
-            // Bereken prijs voordat we opslaan
-            reservering.TotaalPrijs = TariefCalculator.TotaalPrijs(reservering);
+             
+            var tarieven = DAL.TarievenOphalen(); 
+            reservering.TotaalPrijs = TariefCalculator.TotaalPrijs(reservering, tarieven);
+
+            // standaardwaarden initialisen 
             reservering.Status = "Gereserveerd";
             reservering.RegistratieDatum = DateTime.Now;
+
 
             bool inserted = DAL.InsertReservering(reservering);
             if (inserted)

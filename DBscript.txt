@@ -4,6 +4,7 @@ GO
 USE LeMarconnesDB;
 GO
 
+
 CREATE TABLE AccommodatieTypes (
     Id INT PRIMARY KEY,
     Naam NVARCHAR(20) NOT NULL
@@ -15,21 +16,20 @@ INSERT INTO AccommodatieTypes (Id, Naam) VALUES
 (3, 'Hotel');
 GO
 
+
 CREATE TABLE Accommodaties (
     Id INT PRIMARY KEY IDENTITY(1,1),
-    TypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieTypes(Id),
-    MaxPersonen INT NOT NULL,
-    IsBeschikbaar BIT DEFAULT 1
+    AccommodatieTypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieTypes(Id), 
+    PlaatsNummer NVARCHAR(10) NOT NULL, 
+    Capaciteit INT NOT NULL, 
+    Status NVARCHAR(20) DEFAULT 'Beschikbaar' 
 );
 
-INSERT INTO Accommodaties (TypeId, MaxPersonen) VALUES
-(1, 6),
-(1, 4),
-(2, 9),
-(3, 2),
-(3, 4),
-(3, 5);
+INSERT INTO Accommodaties (AccommodatieTypeId, PlaatsNummer, Capaciteit) VALUES
+(1, '1', 6),
+(1, '2', 4); 
 GO
+
 
 CREATE TABLE Klanten (
     Id INT PRIMARY KEY IDENTITY(1,1),
@@ -38,13 +38,34 @@ CREATE TABLE Klanten (
     Achternaam NVARCHAR(50) NOT NULL,
     Email NVARCHAR(100),
     Telefoonnummer NVARCHAR(20),
+    Adres NVARCHAR(200) NULL, 
     RegistratieDatum DATETIME DEFAULT GETDATE()
 );
 
-INSERT INTO Klanten (Voornaam, Tussenvoegsel, Achternaam, Email, Telefoonnummer) VALUES
-('Jan', '', 'Jansen', 'jan@voorbeeld.nl', '0612345678'),
-('Marie', 'de', 'Vries', 'marie@voorbeeld.nl', '0623456789');
+INSERT INTO Klanten (Voornaam, Tussenvoegsel, Achternaam, Email, Telefoonnummer, Adres) VALUES
+('Jan', '', 'Jansen', 'jan@voorbeeld.nl', '0612345678', 'Hoofdstraat 1, Amsterdam'),
+('Marie', 'de', 'Vries', 'marie@voorbeeld.nl', '0623456789', 'Dorpsweg 23, Utrecht');
 GO
+
+
+CREATE TABLE Tarieven (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    AccommodatieTypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieTypes(Id),
+    Type NVARCHAR(30) NOT NULL,
+    Prijs DECIMAL(10,2) NOT NULL,
+    CONSTRAINT UQ_TariefTypePerAccommodatie UNIQUE(AccommodatieTypeId, Type)
+);
+
+INSERT INTO Tarieven (AccommodatieTypeId, Type, Prijs) VALUES
+(1, 'Campingplaats', 7.50),
+(1, 'Volwassene', 6.00),
+(1, 'Kind_0_7', 4.00),
+(1, 'Kind_7_12', 5.00),
+(1, 'Hond', 2.50),
+(1, 'Electriciteit', 7.50),
+(1, 'Toeristenbelasting', 0.25);
+GO
+
 
 CREATE TABLE Reserveringen (
     Id INT PRIMARY KEY IDENTITY(1,1),
@@ -55,17 +76,62 @@ CREATE TABLE Reserveringen (
     AantalVolwassenen INT DEFAULT 1,
     AantalKinderen0_7 INT DEFAULT 0,
     AantalKinderen7_12 INT DEFAULT 0,
-    Hond BIT DEFAULT 0,
-    Elektriciteit BIT DEFAULT 0,
-    AantalDagenElektriciteit INT DEFAULT 0,
+    AantalHonden INT DEFAULT 0, 
+    HeeftElectriciteit BIT DEFAULT 0, 
+    AantalDagenElectriciteit INT DEFAULT 0,
     TotaalPrijs DECIMAL(10,2) NOT NULL,
     Status NVARCHAR(20) DEFAULT 'Gereserveerd',
+    DatumAangemaakt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT CHK_EindNaStart CHECK (EindDatum > StartDatum)
+);
+
+INSERT INTO Reserveringen 
+(KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, AantalKinderen0_7, 
+ AantalKinderen7_12, AantalHonden, HeeftElectriciteit, AantalDagenElectriciteit, TotaalPrijs) VALUES
+(1, 1, '2025-12-03', '2025-12-07', 2, 0, 1, 1, 1, 3, 127.50),
+(2, 2, '2025-12-10', '2025-12-15', 4, 0, 2, 0, 1, 5, 195.00);
+GO
+
+
+CREATE TABLE Accounts (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Gebruikersnaam NVARCHAR(50) NOT NULL UNIQUE,
+    WachtwoordHash NVARCHAR(255) NOT NULL,
+    Rol NVARCHAR(20) DEFAULT 'Klant',
+    KlantId INT NULL FOREIGN KEY REFERENCES Klanten(Id),
+    IsActief BIT DEFAULT 1,
     DatumAangemaakt DATETIME DEFAULT GETDATE()
 );
 
+INSERT INTO Accounts (Gebruikersnaam, WachtwoordHash, Rol, KlantId) VALUES
+('jan.jansen', 'wachtwoord', 'Klant', 1),
+('marie.devries', 'wachtwoord', 'Klant', 2);
+GO
 
-INSERT INTO Reserveringen 
-(KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, AantalKinderen0_7, AantalKinderen7_12, Hond, Elektriciteit, AantalDagenElektriciteit, TotaalPrijs) VALUES
-(1, 1, '2025-12-03', '2025-12-07', 2, 0, 1, 1, 1, 3, 127.50),
-(2, 1, '2025-12-10', '2025-12-15', 4, 0, 2, 0, 1, 5, 195.00);
+
+CREATE PROCEDURE sp_UpdateReserveringStatussen
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    UPDATE Reserveringen 
+    SET Status = 
+        CASE 
+            WHEN GETDATE() < StartDatum THEN 'Gereserveerd'
+            WHEN GETDATE() BETWEEN StartDatum AND EindDatum THEN 'Actief'
+            ELSE 'Verlopen'
+        END
+    WHERE Status != 
+        CASE 
+            WHEN GETDATE() < StartDatum THEN 'Gereserveerd'
+            WHEN GETDATE() BETWEEN StartDatum AND EindDatum THEN 'Actief'
+            ELSE 'Verlopen'
+        END
+    
+    PRINT CONCAT('Statussen bijgewerkt op: ', GETDATE());
+END
+GO
+
+
+EXEC sp_UpdateReserveringStatussen;
 GO

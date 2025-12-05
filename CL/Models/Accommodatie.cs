@@ -8,6 +8,7 @@ namespace CL.Models
 {
     public class Accommodatie
     {
+
         public int AccommodatieId { get; set; }
         public string AccommodatieTypeId { get; set; } // 1 = camping, 2 = hotel, etc
         public string PlaatsNummer { get; set; }

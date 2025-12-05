@@ -4,20 +4,18 @@ namespace CL.Models
 {
     public class Reservering
     {
+
         // auto implemented properties
         public int ReserveringId { get; set; }
+
         public int KlantId { get; set; }
         public int AccommodatieId { get; set; }
-
-         
         public DateTime StartDatum { get; set; }
         public DateTime EindDatum { get; set; }
-
-       
         public int AantalVolwassenen { get; set; }
-               
         public int AantalKinderen0_7 { get; set; }
         public int AantalKinderen7_12 { get; set; }
+
 
         public int AantalHonden { get; set; } = 0;
         public bool HeeftElectriciteit { get; set; } = false;
@@ -31,12 +29,7 @@ namespace CL.Models
         public string Status { get; set; } 
         public DateTime RegistratieDatum { get; set; } = DateTime.Now; // standaard naar huidige tijd en datum
 
-        public int AantalNachten
-        {
-            get { return (EindDatum - StartDatum).Days; }
-        
-        }
 
-        
+        public int AantalNachten => (EindDatum - StartDatum).Days;
     }
 }

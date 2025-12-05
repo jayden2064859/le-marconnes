@@ -8,6 +8,7 @@ namespace CL.Models
 {
     public class Tarief
     {
+
         public int TariefId { get; set; }
         public int AccommodatieTypeId { get; set; }
         public string Type { get; set; }

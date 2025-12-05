@@ -2,65 +2,59 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CL.Services
 {
     public static class TariefCalculator
+{
+
+    public static decimal TotaalPrijs(Reservering reservering, List<Tarief> tarieven)
     {
-        // Vaste tarieven
-        public const decimal Campingplaats_Per_Nacht = 7.50m;
-        public const decimal Volwassene_Per_Nacht = 6.00m;
-        public const decimal Kind_0_7_Per_Nacht = 4.00m;
-        public const decimal Kind_7_12_Per_Nacht = 5.00m;
-        public const decimal Hond_Per_Nacht = 2.50m;
-        public const decimal Elektriciteit_Per_Nacht = 7.50m;
-        public const decimal Toeristenbelasting_Per_Persoon_Per_Nacht = 0.25m;
+        int aantalNachten = reservering.AantalNachten;
+        decimal totaal = 0;
 
-        // Totaalprijs berekenen
-        public static decimal TotaalPrijs(Reservering reservering)
+
+        var campingTarieven = tarieven.Where(t => t.AccommodatieTypeId == 1).ToList();
+
+ 
+        var campingplaats = campingTarieven.First(t => t.Type == "Campingplaats").Prijs;
+        var volwassene = campingTarieven.First(t => t.Type == "Volwassene").Prijs;
+        var kind07 = campingTarieven.First(t => t.Type == "Kind_0_7").Prijs;
+        var kind712 = campingTarieven.First(t => t.Type == "Kind_7_12").Prijs;
+        var hond = campingTarieven.First(t => t.Type == "Hond").Prijs;
+        var electriciteit = campingTarieven.First(t => t.Type == "Electriciteit").Prijs;
+        var toeristenbelasting = campingTarieven.First(t => t.Type == "Toeristenbelasting").Prijs;
+
+        // prijsberekening campingplaats per nacht
+        totaal = campingplaats * aantalNachten;
+
+        // per persoon per nacht
+        totaal += volwassene * reservering.AantalVolwassenen * aantalNachten;
+        totaal += kind07 * reservering.AantalKinderen0_7 * aantalNachten;
+        totaal += kind712 * reservering.AantalKinderen7_12 * aantalNachten;
+
+
+        int totaalPersonen = reservering.AantalVolwassenen +
+                             reservering.AantalKinderen0_7 +
+                             reservering.AantalKinderen7_12;
+        totaal += toeristenbelasting * totaalPersonen * aantalNachten;
+
+        
+       // per hond per nacht
+       if (reservering.AantalHonden > 0)
+       {
+            totaal += hond * reservering.AantalHonden * aantalNachten;
+
+       }
+                
+
+        // electriciteit per nacht (hoeft niet de hele verblijfperiode te zijn)
+        if (reservering.HeeftElectriciteit && reservering.AantalDagenElectriciteit > 0)
         {
-            int aantalNachten = reservering.AantalNachten;
-            decimal totaal = 0;
-
-            // Tarieven van personen worden berekent per persoon, per nacht
-            totaal = Campingplaats_Per_Nacht * aantalNachten; 
-            totaal = totaal + Volwassene_Per_Nacht * reservering.AantalVolwassenen * aantalNachten;
-            totaal = totaal + Kind_0_7_Per_Nacht * reservering.AantalKinderen0_7 * aantalNachten;
-            totaal = totaal + Kind_7_12_Per_Nacht * reservering.AantalKinderen7_12 * aantalNachten;
-
-            // Toeristenbelasting meerekenen
-            int totaalPersonen = reservering.AantalVolwassenen + 
-                                 reservering.AantalKinderen0_7 + 
-                                 reservering.AantalKinderen7_12;
-
-            totaal = totaal + Toeristenbelasting_Per_Persoon_Per_Nacht * totaalPersonen * aantalNachten;
-
-            // Hond kost extra per nacht
-            if (reservering.AantalHonden > 0)
-            {
-                totaal = totaal + Hond_Per_Nacht * reservering.AantalHonden * aantalNachten;
-            }
-
-            // Elektriciteit kost extra per nacht
-            if (reservering.HeeftElectriciteit && reservering.AantalDagenElectriciteit > 0)
-            {
-                totaal = totaal + Elektriciteit_Per_Nacht * reservering.AantalDagenElectriciteit;
-            }
-
-            return Math.Round(totaal, 2); // afronden op 2 decimalen
-
+            totaal += electriciteit * reservering.AantalDagenElectriciteit;
         }
+
+        return Math.Round(totaal, 2);
     }
-
-
-
-
-
-
-
-
-
-
+}
 }

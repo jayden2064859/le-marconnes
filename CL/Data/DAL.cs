@@ -17,13 +17,21 @@ namespace CL.Data
                 connection.Open();
 
                 string sql = @"
-                    INSERT INTO Reserveringen 
+                INSERT INTO Reserveringen 
                     (KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, 
+<<<<<<< HEAD
                      AantalKinderen0_7, AantalKinderen7_12, AantalHonden, HeeftElectriciteit, 
                      AantalDagenElectriciteit, TotaalPrijs, RegistratieDatum) 
                     VALUES (@KlantId, @AccommodatieId, @StartDatum, @EindDatum, @AantalVolwassenen,
                             @AantalKinderen0_7, @AantalKinderen7_12, @AantalHonden, @HeeftElectriciteit,
                             @AantalDagenElectriciteit, @TotaalPrijs, @RegistratieDatum);
+=======
+                    AantalKinderen0_7, AantalKinderen7_12, AantalHonden, HeeftElectriciteit, 
+                    AantalDagenElectriciteit, TotaalPrijs, Status, DatumAangemaakt) 
+                VALUES (@KlantId, @AccommodatieId, @StartDatum, @EindDatum, @AantalVolwassenen,
+                    @AantalKinderen0_7, @AantalKinderen7_12, @AantalHonden, @HeeftElectriciteit,
+                    @AantalDagenElectriciteit, @TotaalPrijs, @Status, @DatumAangemaakt);
+>>>>>>> github-changes
                 ";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
@@ -37,9 +45,12 @@ namespace CL.Data
                     command.Parameters.AddWithValue("@AantalKinderen7_12", reservering.AantalKinderen7_12);
                     command.Parameters.AddWithValue("@AantalHonden", reservering.AantalHonden);
                     command.Parameters.AddWithValue("@HeeftElectriciteit", reservering.HeeftElectriciteit);
+
                     command.Parameters.AddWithValue("@AantalDagenEleCtriciteit", reservering.AantalDagenElectriciteit);
                     command.Parameters.AddWithValue("@TotaalPrijs", reservering.TotaalPrijs);
                     command.Parameters.AddWithValue("@RegistratieDatum", reservering.RegistratieDatum);
+                    command.Parameters.AddWithValue("@Status", reservering.Status);
+
 
                     int rowsAffected = command.ExecuteNonQuery();
                     return rowsAffected > 0;
@@ -190,6 +201,33 @@ namespace CL.Data
                     return rows > 0;
                 }
             }
+        }
+
+        public static List<Tarief> TarievenOphalen()
+        {
+            List<Tarief> tarieven = new List<Tarief>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Tarieven WHERE AccommodatieTypeId = 1"; // alleen camping tarieven worden opgehaald
+
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tarieven.Add(new Tarief
+                        {
+                            TariefId = Convert.ToInt32(reader["Id"]),
+                            AccommodatieTypeId = Convert.ToInt32(reader["AccommodatieTypeId"]),
+                            Type = reader["Type"].ToString(),
+                            Prijs = Convert.ToDecimal(reader["Prijs"])
+                        });
+                    }
+                }
+            }
+            return tarieven;
         }
 
     }
