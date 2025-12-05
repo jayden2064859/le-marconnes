@@ -73,7 +73,7 @@ namespace LeMarconnes
 
                     foreach (var res in reserveringen)
                     {
-                        Console.WriteLine($"ID: {res.Id}");
+                        Console.WriteLine($"ID: {res.ReserveringId}");
                         Console.WriteLine($"Klant: {res.KlantId}, Accommodatie: {res.AccommodatieId}");
                         Console.WriteLine($"Van: {res.StartDatum:dd-MM} tot {res.EindDatum:dd-MM}");
                         Console.WriteLine($"Aantal volwassenen: {res.AantalVolwassenen}");
@@ -84,6 +84,7 @@ namespace LeMarconnes
                         Console.WriteLine("\n");
                     }
                 }
+
             }
             catch
             {
@@ -110,15 +111,15 @@ namespace LeMarconnes
                         var res = await response.Content.ReadFromJsonAsync<Reservering>();
 
                         Console.WriteLine($"\n--- RESERVERING {id} GEVONDEN ---");
-                        Console.WriteLine($"ID: {res.Id}");
+                        Console.WriteLine($"ID: {res.ReserveringId}");
                         Console.WriteLine($"Klant: {res.KlantId}");
                         Console.WriteLine($"Accommodatie: {res.AccommodatieId}");
                         Console.WriteLine($"Van: {res.StartDatum:dd-MM-yyyy} tot {res.EindDatum:dd-MM-yyyy}");
                         Console.WriteLine($"Volwassenen: {res.AantalVolwassenen}");
                         Console.WriteLine($"Kinderen 0-7: {res.AantalKinderen0_7}");
                         Console.WriteLine($"Kinderen 7-12: {res.AantalKinderen7_12}");
-                        Console.WriteLine($"Hond: {(res.Hond ? "Ja" : "Nee")}");
-                        Console.WriteLine($"Elektriciteit: {(res.Elektriciteit ? "Ja" : "Nee")}");
+                        Console.WriteLine($"Hond: {res.AantalHonden}");
+                        Console.WriteLine($"Elektriciteit: {(res.HeeftElectriciteit ? "Ja" : "Nee")}");
                         Console.WriteLine($"Prijs: {res.TotaalPrijs},-");
                         Console.WriteLine($"Status: {res.Status}");
                         Console.WriteLine(new string('-', 30));
@@ -171,15 +172,15 @@ namespace LeMarconnes
             nieuweReservering.AantalKinderen7_12 = int.Parse(Console.ReadLine());
 
             Console.Write("Hond mee? (j/n): ");
-            nieuweReservering.Hond = Console.ReadLine().ToLower() == "j";
+            nieuweReservering.AantalHonden = int.Parse(Console.ReadLine());
 
             Console.Write("Elektriciteit gewenst? (j/n): ");
-            nieuweReservering.Elektriciteit = Console.ReadLine().ToLower() == "j";
+            nieuweReservering.HeeftElectriciteit = Console.ReadLine().ToLower() == "j";
 
-            if (nieuweReservering.Elektriciteit)
+            if (nieuweReservering.HeeftElectriciteit)
             {
                 Console.Write($"Voor hoeveel nachten elektriciteit? (max {nieuweReservering.AantalNachten}): ");
-                nieuweReservering.AantalDagenElektriciteit = int.Parse(Console.ReadLine());
+                nieuweReservering.AantalDagenElectriciteit = int.Parse(Console.ReadLine());
             }
 
             nieuweReservering.Status = "Gereserveerd";
@@ -254,9 +255,9 @@ namespace LeMarconnes
                     Console.WriteLine($"5.  AantalVolwassenen: {res.AantalVolwassenen}");
                     Console.WriteLine($"6.  AantalKinderen0_7: {res.AantalKinderen0_7}");
                     Console.WriteLine($"7.  AantalKinderen7_12: {res.AantalKinderen7_12}");
-                    Console.WriteLine($"8.  Hond: {res.Hond}");
-                    Console.WriteLine($"9.  Elektriciteit: {res.Elektriciteit}");
-                    Console.WriteLine($"10. AantalDagenElektriciteit: {res.AantalDagenElektriciteit}");
+                    Console.WriteLine($"8.  Hond: {res.AantalHonden}");
+                    Console.WriteLine($"9.  Elektriciteit: {res.HeeftElectriciteit}");
+                    Console.WriteLine($"10. AantalDagenElektriciteit: {res.AantalDagenElectriciteit}");
                     Console.WriteLine($"11. Status: {res.Status}");
                     Console.WriteLine(new string('-', 30));
 
@@ -298,15 +299,15 @@ namespace LeMarconnes
                             break;
                         case "8":
                             Console.Write("Hond (true/false): ");
-                            res.Hond = bool.Parse(Console.ReadLine());
+                            res.AantalHonden = int.Parse(Console.ReadLine());
                             break;
                         case "9":
                             Console.Write("Elektriciteit (true/false): ");
-                            res.Elektriciteit = bool.Parse(Console.ReadLine());
+                            res.HeeftElectriciteit = bool.Parse(Console.ReadLine());
                             break;
                         case "10":
                             Console.Write("AantalDagenElektriciteit: ");
-                            res.AantalDagenElektriciteit = int.Parse(Console.ReadLine());
+                            res.AantalDagenElectriciteit = int.Parse(Console.ReadLine());
                             break;
                         case "11":
                             Console.Write("Nieuwe Status: ");

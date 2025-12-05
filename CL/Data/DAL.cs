@@ -19,11 +19,11 @@ namespace CL.Data
                 string sql = @"
                     INSERT INTO Reserveringen 
                     (KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, 
-                     AantalKinderen0_7, AantalKinderen7_12, Hond, Elektriciteit, 
-                     AantalDagenElektriciteit, TotaalPrijs, DatumAangemaakt) 
+                     AantalKinderen0_7, AantalKinderen7_12, AantalHonden, HeeftElectriciteit, 
+                     AantalDagenElectriciteit, TotaalPrijs, RegistratieDatum) 
                     VALUES (@KlantId, @AccommodatieId, @StartDatum, @EindDatum, @AantalVolwassenen,
-                            @AantalKinderen0_7, @AantalKinderen7_12, @Hond, @Elektriciteit,
-                            @AantalDagenElektriciteit, @TotaalPrijs, @DatumAangemaakt);
+                            @AantalKinderen0_7, @AantalKinderen7_12, @AantalHonden, @HeeftElectriciteit,
+                            @AantalDagenElectriciteit, @TotaalPrijs, @RegistratieDatum);
                 ";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
@@ -35,11 +35,11 @@ namespace CL.Data
                     command.Parameters.AddWithValue("@AantalVolwassenen", reservering.AantalVolwassenen);
                     command.Parameters.AddWithValue("@AantalKinderen0_7", reservering.AantalKinderen0_7);
                     command.Parameters.AddWithValue("@AantalKinderen7_12", reservering.AantalKinderen7_12);
-                    command.Parameters.AddWithValue("@Hond", reservering.Hond);
-                    command.Parameters.AddWithValue("@Elektriciteit", reservering.Elektriciteit);
-                    command.Parameters.AddWithValue("@AantalDagenElektriciteit", reservering.AantalDagenElektriciteit);
+                    command.Parameters.AddWithValue("@AantalHonden", reservering.AantalHonden);
+                    command.Parameters.AddWithValue("@HeeftElectriciteit", reservering.HeeftElectriciteit);
+                    command.Parameters.AddWithValue("@AantalDagenEleCtriciteit", reservering.AantalDagenElectriciteit);
                     command.Parameters.AddWithValue("@TotaalPrijs", reservering.TotaalPrijs);
-                    command.Parameters.AddWithValue("@DatumAangemaakt", reservering.DatumAangemaakt);
+                    command.Parameters.AddWithValue("@RegistratieDatum", reservering.RegistratieDatum);
 
                     int rowsAffected = command.ExecuteNonQuery();
                     return rowsAffected > 0;
@@ -65,7 +65,7 @@ namespace CL.Data
                     {
                         Reservering reservering = new Reservering
                         {
-                            Id = Convert.ToInt32(reader["Id"]),
+                            ReserveringId = Convert.ToInt32(reader["ReserveringId"]),
                             KlantId = Convert.ToInt32(reader["KlantId"]),
                             AccommodatieId = Convert.ToInt32(reader["AccommodatieId"]),
                             StartDatum = Convert.ToDateTime(reader["StartDatum"]),
@@ -73,12 +73,12 @@ namespace CL.Data
                             AantalVolwassenen = Convert.ToInt32(reader["AantalVolwassenen"]),
                             AantalKinderen0_7 = Convert.ToInt32(reader["AantalKinderen0_7"]),
                             AantalKinderen7_12 = Convert.ToInt32(reader["AantalKinderen7_12"]),
-                            Hond = Convert.ToBoolean(reader["Hond"]),
-                            Elektriciteit = Convert.ToBoolean(reader["Elektriciteit"]),
-                            AantalDagenElektriciteit = Convert.ToInt32(reader["AantalDagenElektriciteit"]),
+                            AantalHonden = Convert.ToInt32(reader["AantalHonden"]),
+                            HeeftElectriciteit = Convert.ToBoolean(reader["HeeftElectriciteit"]),
+                            AantalDagenElectriciteit = Convert.ToInt32(reader["AantalDagenElectriciteit"]),
                             TotaalPrijs = Convert.ToDecimal(reader["TotaalPrijs"]),
                             Status = reader["Status"].ToString(),
-                            DatumAangemaakt = Convert.ToDateTime(reader["DatumAangemaakt"])
+                            RegistratieDatum = Convert.ToDateTime(reader["RegistratieDatum"])
                         };
                         reserveringen.Add(reservering);
                     }
@@ -108,6 +108,7 @@ namespace CL.Data
             }
         }
 
+        // reservering ophalen op id
         public static Reservering GetReserveringById(int id)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -127,7 +128,7 @@ namespace CL.Data
 
                         return new Reservering
                         {
-                            Id = Convert.ToInt32(reader["Id"]),
+                            ReserveringId = Convert.ToInt32(reader["ReserveringId"]),
                             KlantId = Convert.ToInt32(reader["KlantId"]),
                             AccommodatieId = Convert.ToInt32(reader["AccommodatieId"]),
                             StartDatum = Convert.ToDateTime(reader["StartDatum"]),
@@ -135,12 +136,12 @@ namespace CL.Data
                             AantalVolwassenen = Convert.ToInt32(reader["AantalVolwassenen"]),
                             AantalKinderen0_7 = Convert.ToInt32(reader["AantalKinderen0_7"]),
                             AantalKinderen7_12 = Convert.ToInt32(reader["AantalKinderen7_12"]),
-                            Hond = Convert.ToBoolean(reader["Hond"]),
-                            Elektriciteit = Convert.ToBoolean(reader["Elektriciteit"]),
-                            AantalDagenElektriciteit = Convert.ToInt32(reader["AantalDagenElektriciteit"]),
+                            AantalHonden = Convert.ToInt32(reader["AantalHonden"]),
+                            HeeftElectriciteit = Convert.ToBoolean(reader["HeeftElectriciteit"]),
+                            AantalDagenElectriciteit = Convert.ToInt32(reader["AantalDagenElectriciteit"]),
                             TotaalPrijs = Convert.ToDecimal(reader["TotaalPrijs"]),
                             Status = reader["Status"].ToString(),
-                            DatumAangemaakt = Convert.ToDateTime(reader["DatumAangemaakt"])
+                            RegistratieDatum = Convert.ToDateTime(reader["RegistratieDatum"])
                         };
                     }
                 }
@@ -164,15 +165,15 @@ namespace CL.Data
                 AantalVolwassenen = @AantalVolwassenen,
                 AantalKinderen0_7 = @AantalKinderen0_7,
                 AantalKinderen7_12 = @AantalKinderen7_12,
-                Hond = @Hond,
-                Elektriciteit = @Elektriciteit,
-                AantalDagenElektriciteit = @AantalDagenElektriciteit,
+                AantalHonden = @AantalHonden,
+                HeeftElectriciteit = @HeeftElectriciteit,
+                AantalDagenElectriciteit = @AantalDagenElectriciteit,
                 Status = @Status
             WHERE Id = @Id";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", res.Id);
+                    command.Parameters.AddWithValue("@ReserveringId", res.ReserveringId);
                     command.Parameters.AddWithValue("@KlantId", res.KlantId);
                     command.Parameters.AddWithValue("@AccommodatieId", res.AccommodatieId);
                     command.Parameters.AddWithValue("@StartDatum", res.StartDatum);
@@ -180,9 +181,9 @@ namespace CL.Data
                     command.Parameters.AddWithValue("@AantalVolwassenen", res.AantalVolwassenen);
                     command.Parameters.AddWithValue("@AantalKinderen0_7", res.AantalKinderen0_7);
                     command.Parameters.AddWithValue("@AantalKinderen7_12", res.AantalKinderen7_12);
-                    command.Parameters.AddWithValue("@Hond", res.Hond);
-                    command.Parameters.AddWithValue("@Elektriciteit", res.Elektriciteit);
-                    command.Parameters.AddWithValue("@AantalDagenElektriciteit", res.AantalDagenElektriciteit);
+                    command.Parameters.AddWithValue("@AantalHonden", res.AantalHonden);
+                    command.Parameters.AddWithValue("@HeeftElectriciteit", res.HeeftElectriciteit);
+                    command.Parameters.AddWithValue("@AantalDagenElectriciteit", res.AantalDagenElectriciteit);
                     command.Parameters.AddWithValue("@Status", res.Status);
 
                     int rows = command.ExecuteNonQuery();

@@ -19,6 +19,7 @@ namespace API.Controllers
             return Ok(reserveringen);
         }
 
+
         [HttpGet("{id}")]
         public ActionResult<Reservering> GetById(int id)
         {
@@ -30,6 +31,7 @@ namespace API.Controllers
             return Ok(reservering);
         }
 
+
         // POST: api/reserveringen
         [HttpPost]
         public ActionResult<Reservering> Create([FromBody] Reservering reservering)
@@ -37,7 +39,7 @@ namespace API.Controllers
             // Bereken prijs voordat we opslaan
             reservering.TotaalPrijs = TariefCalculator.TotaalPrijs(reservering);
             reservering.Status = "Gereserveerd";
-            reservering.DatumAangemaakt = DateTime.Now;
+            reservering.RegistratieDatum = DateTime.Now;
 
             bool inserted = DAL.InsertReservering(reservering);
             if (inserted)
@@ -49,6 +51,7 @@ namespace API.Controllers
                 return BadRequest("Kan reservering niet toevoegen");
             }
         }
+
 
         // DELETE: api/reserveringen/{id}
         [HttpDelete("{id}")]
@@ -62,12 +65,13 @@ namespace API.Controllers
             return NotFound($"Reservering met Id {id} niet gevonden");
         }
 
+
         // PUT: api/reseveringen/{id}
         [HttpPut("{id}")]
         public ActionResult Update(int id, [FromBody] Reservering res)
         {
-            if (res == null || res.Id != id)
-                return BadRequest("Reservering ongeldig");
+            if (res == null || res.ReserveringId != id)
+                return BadRequest("ReserveringId ongeldig");
 
             bool succes = DAL.UpdateReservering(res);
 

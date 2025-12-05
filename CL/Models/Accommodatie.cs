@@ -8,15 +8,16 @@ namespace CL.Models
 {
     public class Accommodatie
     {
-        public int Id { get; set; }
-        public string TypeId { get; set; } // 1 = camping, 2 = hotel, etc
-        public int MaxPersonen { get; set; }
-        public bool IsBeschikbaar { get; set; } = true;
+        public int AccommodatieId { get; set; }
+        public string AccommodatieTypeId { get; set; } // 1 = camping, 2 = hotel, etc
+        public string PlaatsNummer { get; set; }
+        public int Capaciteit { get; set; }
+        public string Status { get; set; } = "Beschikbaar";
     }
 
     public class AccommodatieType
     {
-        public int Id { get; set; }
+        public int AccommodatieTypeId { get; set; }
         public string Naam { get; set; } = "";
     }
 }

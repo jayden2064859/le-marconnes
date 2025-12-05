@@ -38,15 +38,15 @@ namespace CL.Services
             totaal = totaal + Toeristenbelasting_Per_Persoon_Per_Nacht * totaalPersonen * aantalNachten;
 
             // Hond kost extra per nacht
-            if (reservering.Hond)
+            if (reservering.AantalHonden > 0)
             {
-                totaal = totaal + Hond_Per_Nacht * aantalNachten;
+                totaal = totaal + Hond_Per_Nacht * reservering.AantalHonden * aantalNachten;
             }
 
             // Elektriciteit kost extra per nacht
-            if (reservering.Elektriciteit && reservering.AantalDagenElektriciteit > 0)
+            if (reservering.HeeftElectriciteit && reservering.AantalDagenElectriciteit > 0)
             {
-                totaal = totaal + Elektriciteit_Per_Nacht * reservering.AantalDagenElektriciteit;
+                totaal = totaal + Elektriciteit_Per_Nacht * reservering.AantalDagenElectriciteit;
             }
 
             return Math.Round(totaal, 2); // afronden op 2 decimalen
