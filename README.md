@@ -25,5 +25,5 @@ backend systeem voor reserveringen van camping Le Marconnes
 
 1. Clone repo: `git clone https://github.com/jayden2064859/le-marconnes.git`
 2. Run DBscript in SQL Server Management Studio 
-3. Connection string aanpassen naar eigen servernaam (Server=[naam]\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;)
+3. Connection string in DAL.cs aanpassen naar eigen servernaam (Server=[naam]\SQLEXPRESS;Database=LeMarconnesDB;Trusted_Connection=True;TrustServerCertificate=True;) 
 4. Rechtermuisklik op solution -> Configure Startup projects -> Multiple Startup Projects -> selecteer LeMarconnes & API
