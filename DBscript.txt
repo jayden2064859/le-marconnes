@@ -5,34 +5,34 @@ USE LeMarconnesDB;
 GO
 
 
-CREATE TABLE AccommodatieTypes (
-    Id INT PRIMARY KEY,
+CREATE TABLE AccommodatieType (
+    AccommodatieTypeId INT PRIMARY KEY,
     Naam NVARCHAR(20) NOT NULL
 );
 
-INSERT INTO AccommodatieTypes (Id, Naam) VALUES
+INSERT INTO AccommodatieType (AccommodatieTypeId, Naam) VALUES
 (1, 'Camping'),
 (2, 'Gîte'),
 (3, 'Hotel');
 GO
 
 
-CREATE TABLE Accommodaties (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    AccommodatieTypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieTypes(Id), 
+CREATE TABLE Accommodatie (
+    AccommodatieId INT PRIMARY KEY IDENTITY(1,1),
+    AccommodatieTypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieType(AccommodatieTypeId), 
     PlaatsNummer NVARCHAR(10) NOT NULL, 
     Capaciteit INT NOT NULL, 
     Status NVARCHAR(20) DEFAULT 'Beschikbaar' 
 );
 
-INSERT INTO Accommodaties (AccommodatieTypeId, PlaatsNummer, Capaciteit) VALUES
+INSERT INTO Accommodatie (AccommodatieTypeId, PlaatsNummer, Capaciteit) VALUES
 (1, '1', 6),
 (1, '2', 4); 
 GO
 
 
-CREATE TABLE Klanten (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+CREATE TABLE Klant (
+    KlantId INT PRIMARY KEY IDENTITY(1,1),
     Voornaam NVARCHAR(50) NOT NULL,
     Tussenvoegsel NVARCHAR(20),
     Achternaam NVARCHAR(50) NOT NULL,
@@ -42,21 +42,21 @@ CREATE TABLE Klanten (
     RegistratieDatum DATETIME DEFAULT GETDATE()
 );
 
-INSERT INTO Klanten (Voornaam, Tussenvoegsel, Achternaam, Email, Telefoonnummer, Adres) VALUES
+INSERT INTO Klant (Voornaam, Tussenvoegsel, Achternaam, Email, Telefoonnummer, Adres) VALUES
 ('Jan', '', 'Jansen', 'jan@voorbeeld.nl', '0612345678', 'Hoofdstraat 1, Amsterdam'),
 ('Marie', 'de', 'Vries', 'marie@voorbeeld.nl', '0623456789', 'Dorpsweg 23, Utrecht');
 GO
 
 
-CREATE TABLE Tarieven (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    AccommodatieTypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieTypes(Id),
+CREATE TABLE Tarief (
+    TariefId INT PRIMARY KEY IDENTITY(1,1),
+    AccommodatieTypeId INT NOT NULL FOREIGN KEY REFERENCES AccommodatieType(AccommodatieTypeId),
     Type NVARCHAR(30) NOT NULL,
     Prijs DECIMAL(10,2) NOT NULL,
     CONSTRAINT UQ_TariefTypePerAccommodatie UNIQUE(AccommodatieTypeId, Type)
 );
 
-INSERT INTO Tarieven (AccommodatieTypeId, Type, Prijs) VALUES
+INSERT INTO Tarief (AccommodatieTypeId, Type, Prijs) VALUES
 (1, 'Campingplaats', 7.50),
 (1, 'Volwassene', 6.00),
 (1, 'Kind_0_7', 4.00),
@@ -67,10 +67,10 @@ INSERT INTO Tarieven (AccommodatieTypeId, Type, Prijs) VALUES
 GO
 
 
-CREATE TABLE Reserveringen (
-    Id INT PRIMARY KEY IDENTITY(1,1),
-    KlantId INT NOT NULL FOREIGN KEY REFERENCES Klanten(Id),
-    AccommodatieId INT NOT NULL FOREIGN KEY REFERENCES Accommodaties(Id),
+CREATE TABLE Reservering (
+    ReserveringId INT PRIMARY KEY IDENTITY(1,1),
+    KlantId INT NOT NULL FOREIGN KEY REFERENCES Klant(KlantId),
+    AccommodatieId INT NOT NULL FOREIGN KEY REFERENCES Accommodatie(AccommodatieId),
     StartDatum DATE NOT NULL,
     EindDatum DATE NOT NULL,
     AantalVolwassenen INT DEFAULT 1,
@@ -81,11 +81,11 @@ CREATE TABLE Reserveringen (
     AantalDagenElectriciteit INT DEFAULT 0,
     TotaalPrijs DECIMAL(10,2) NOT NULL,
     Status NVARCHAR(20) DEFAULT 'Gereserveerd',
-    DatumAangemaakt DATETIME DEFAULT GETDATE(),
+    RegistratieDatum DATETIME DEFAULT GETDATE(),
     CONSTRAINT CHK_EindNaStart CHECK (EindDatum > StartDatum)
 );
 
-INSERT INTO Reserveringen 
+INSERT INTO Reservering 
 (KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, AantalKinderen0_7, 
  AantalKinderen7_12, AantalHonden, HeeftElectriciteit, AantalDagenElectriciteit, TotaalPrijs) VALUES
 (1, 1, '2025-12-03', '2025-12-07', 2, 0, 1, 1, 1, 3, 127.50),
@@ -93,17 +93,17 @@ INSERT INTO Reserveringen
 GO
 
 
-CREATE TABLE Accounts (
-    Id INT PRIMARY KEY IDENTITY(1,1),
+CREATE TABLE Account (
+    AccountId INT PRIMARY KEY IDENTITY(1,1),
     Gebruikersnaam NVARCHAR(50) NOT NULL UNIQUE,
     WachtwoordHash NVARCHAR(255) NOT NULL,
     Rol NVARCHAR(20) DEFAULT 'Klant',
-    KlantId INT NULL FOREIGN KEY REFERENCES Klanten(Id),
+    KlantId INT NULL FOREIGN KEY REFERENCES Klant(KlantId),  
     IsActief BIT DEFAULT 1,
-    DatumAangemaakt DATETIME DEFAULT GETDATE()
+    RegistratieDatum DATETIME DEFAULT GETDATE()
 );
 
-INSERT INTO Accounts (Gebruikersnaam, WachtwoordHash, Rol, KlantId) VALUES
+INSERT INTO Account (Gebruikersnaam, WachtwoordHash, Rol, KlantId) VALUES
 ('jan.jansen', 'wachtwoord', 'Klant', 1),
 ('marie.devries', 'wachtwoord', 'Klant', 2);
 GO
@@ -114,7 +114,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     
-    UPDATE Reserveringen 
+    UPDATE Reservering 
     SET Status = 
         CASE 
             WHEN GETDATE() < StartDatum THEN 'Gereserveerd'
@@ -131,7 +131,6 @@ BEGIN
     PRINT CONCAT('Statussen bijgewerkt op: ', GETDATE());
 END
 GO
-
 
 EXEC sp_UpdateReserveringStatussen;
 GO
