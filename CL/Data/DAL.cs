@@ -17,7 +17,7 @@ namespace CL.Data
                 connection.Open();
 
                 string sql = @"
-                INSERT INTO Reserveringen 
+                INSERT INTO Reservering 
                     (KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, 
                      AantalKinderen0_7, AantalKinderen7_12, AantalHonden, HeeftElectriciteit, 
                      AantalDagenElectriciteit, TotaalPrijs, RegistratieDatum)
@@ -40,7 +40,7 @@ namespace CL.Data
                     command.Parameters.AddWithValue("@AantalHonden", reservering.AantalHonden);
                     command.Parameters.AddWithValue("@HeeftElectriciteit", reservering.HeeftElectriciteit);
 
-                    command.Parameters.AddWithValue("@AantalDagenEleCtriciteit", reservering.AantalDagenElectriciteit);
+                    command.Parameters.AddWithValue("@AantalDagenElectriciteit", reservering.AantalDagenElectriciteit);
                     command.Parameters.AddWithValue("@TotaalPrijs", reservering.TotaalPrijs);
                     command.Parameters.AddWithValue("@RegistratieDatum", reservering.RegistratieDatum);
                     command.Parameters.AddWithValue("@Status", reservering.Status);
@@ -61,7 +61,7 @@ namespace CL.Data
             {
                 connection.Open();
 
-                string sql = "SELECT * FROM Reserveringen";
+                string sql = "SELECT * FROM Reservering";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -101,11 +101,11 @@ namespace CL.Data
             {
                 connection.Open();
 
-                string sql = "DELETE FROM Reserveringen WHERE Id = @Id";
+                string sql = "DELETE FROM Reservering WHERE ReserveringId = @ReserveringId";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@ReserveringId", id);
 
                     int rowsAffected = command.ExecuteNonQuery();
                     return rowsAffected > 0;
@@ -120,11 +120,11 @@ namespace CL.Data
             {
                 connection.Open();
 
-                string sql = "SELECT * FROM Reserveringen WHERE Id = @Id";
+                string sql = "SELECT * FROM Reservering WHERE ReserveringId = @ReserveringId";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@ReserveringId", id);
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -162,7 +162,7 @@ namespace CL.Data
                 connection.Open();
 
                 string sql = @"
-            UPDATE Reserveringen SET
+            UPDATE Reservering SET
                 KlantId = @KlantId,
                 AccommodatieId = @AccommodatieId,
                 StartDatum = @StartDatum,
@@ -174,7 +174,7 @@ namespace CL.Data
                 HeeftElectriciteit = @HeeftElectriciteit,
                 AantalDagenElectriciteit = @AantalDagenElectriciteit,
                 Status = @Status
-            WHERE Id = @Id";
+            WHERE ReserveringId = @ReserveringId";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 {
@@ -204,7 +204,7 @@ namespace CL.Data
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM Tarieven WHERE AccommodatieTypeId = 1"; // alleen camping tarieven worden opgehaald
+                string sql = "SELECT * FROM Tarief WHERE AccommodatieTypeId = 1"; // alleen camping tarieven worden opgehaald
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -213,7 +213,7 @@ namespace CL.Data
                     {
                         tarieven.Add(new Tarief
                         {
-                            TariefId = Convert.ToInt32(reader["Id"]),
+                            TariefId = Convert.ToInt32(reader["TariefId"]),
                             AccommodatieTypeId = Convert.ToInt32(reader["AccommodatieTypeId"]),
                             Type = reader["Type"].ToString(),
                             Prijs = Convert.ToDecimal(reader["Prijs"])

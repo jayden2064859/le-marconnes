@@ -312,7 +312,7 @@ namespace LeMarconnes
                             res.AantalKinderen7_12 = int.Parse(Console.ReadLine());
                             break;
                         case "8":
-                            Console.Write("Hond (true/false): ");
+                            Console.Write("Aantal honden: ");
                             res.AantalHonden = int.Parse(Console.ReadLine());
                             break;
                         case "9":
