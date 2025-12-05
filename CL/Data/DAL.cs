@@ -19,19 +19,13 @@ namespace CL.Data
                 string sql = @"
                 INSERT INTO Reserveringen 
                     (KlantId, AccommodatieId, StartDatum, EindDatum, AantalVolwassenen, 
-<<<<<<< HEAD
                      AantalKinderen0_7, AantalKinderen7_12, AantalHonden, HeeftElectriciteit, 
-                     AantalDagenElectriciteit, TotaalPrijs, RegistratieDatum) 
-                    VALUES (@KlantId, @AccommodatieId, @StartDatum, @EindDatum, @AantalVolwassenen,
+                     AantalDagenElectriciteit, TotaalPrijs, RegistratieDatum)
+
+                VALUES (@KlantId, @AccommodatieId, @StartDatum, @EindDatum, @AantalVolwassenen,
                             @AantalKinderen0_7, @AantalKinderen7_12, @AantalHonden, @HeeftElectriciteit,
                             @AantalDagenElectriciteit, @TotaalPrijs, @RegistratieDatum);
-=======
-                    AantalKinderen0_7, AantalKinderen7_12, AantalHonden, HeeftElectriciteit, 
-                    AantalDagenElectriciteit, TotaalPrijs, Status, DatumAangemaakt) 
-                VALUES (@KlantId, @AccommodatieId, @StartDatum, @EindDatum, @AantalVolwassenen,
-                    @AantalKinderen0_7, @AantalKinderen7_12, @AantalHonden, @HeeftElectriciteit,
-                    @AantalDagenElectriciteit, @TotaalPrijs, @Status, @DatumAangemaakt);
->>>>>>> github-changes
+
                 ";
 
                 using (SqlCommand command = new SqlCommand(sql, connection))
